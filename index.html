@@ -115,6 +115,8 @@
     text-align: center;
   }
   .table-wrap tbody th { text-align: left; font-weight: 600; background: #FAFAFA; }
+  .table-wrap table.impact th, .table-wrap table.impact td { text-align: left; vertical-align: top; }
+  .table-wrap table.impact thead th { text-align: left; }
   /* The first h2 after hero shouldn't have a top border gap that looks odd */
   .wrap > h2:first-child { border-top: none; padding-top: 0; margin-top: 0; }
   a { color: var(--forest); }
@@ -145,25 +147,53 @@
 <ol>
 <li>At most, 20% of users are actually opting out from research outreach.
 </li>
-<li>The current opt-out rate is likely inflated due to the notifications page design. Redesigning this page could ensure that new users aren&#x27;t inadvertently opting out. Additional steps would be required to rectify the issue for the 25 - 70% of users for whom the intent is unclear
+<li>The current opt-out rate is likely exaggerated due to the notifications page design. Redesigning this page could ensure that new users aren&#x27;t inadvertently opting out. Additional steps would be required to rectify the issue for the 25 - 70% of users for whom the intent is unclear
 </li>
-<li>The Global Experimentation Framework has been excluding users from research outreach. This exclusion hit ~30% of opted-in users on average, and in some studies up to 90% depending on the segment. This was inadvertent - research should not have been included in this exclusion. This mistake has now been rectified
+<li>The Global Experimentation Framework has been excluding users from research outreach. This exclusion hit ~30% of opted-in users on average, and in some studies up to 90% depending on the segment. Research was included in this exclusion by default rather than by design, the filter was applied as part of a broader &quot;key-email-subjects&quot; exclusion. CRM has confirmed research should sit outside it, and this has now been corrected.
 </li>
-<li>Outreach cooldown groups research outreach and marketing outreach as one, and makes users who have received outreach in the last 30 days ineligible. This impacts up to 50% of users. If research outreach was handled separately, this would come down to 5%.
+<li>Outreach cooldown groups research and marketing outreach as one, and makes users who have received outreach in the last 30 days ineligible. While it is good practice to not over-email users, we need to consider whether email and marketing should be handled separately. As currently implemented, up to 50% of users are ineligible for research emails on a daily basis. If research outreach was handled separately, this would come down to 5%.
 </li>
 </ol>
 <p><strong>The detail</strong></p>
-<p>Researchers struggle to recruit and survey from users, as Braze filters substantially reduce eligible contacts. Upwards of 95% of target customers can be deemed ineligible to contact, but often that ineligibility is bundled into an opaque &quot;email-eligibility&quot; criteria.</p>
-<p>Such high opt-out rates are problematic for UXR; it limits who we can speak to for qualitative research, makes quantitative research near impossible, and introduces tremendous bias into the results of any research we are able to do.</p>
-<p>There are two questions to answer:</p>
-<ol>
-<li>Are Wise customers really so unwilling to receive research outreach and give feedback? This opt out rate is well above the industry norm
-</li>
-<li>If not, what is the cause of the discrepancy between Braze&#x27;s opt-out rate and what the users&#x27; opt-out intent?
-</li>
-</ol>
+<p>Researchers struggle to recruit and survey from users, as Braze filters substantially reduce eligible contacts. Upwards of 95% of target customers can be deemed ineligible to contact, but often that ineligibility is bundled into a single &quot;email-eligibility&quot; criterion, which makes it hard to see which underlying filter is doing the work.</p>
+<p>Such high opt-out rates materially limit UXR; they restrict who we can speak to for qualitative research, make quantitative research near impossible, and introduce significant bias into any research we are able to do.</p>
+<div class="table-wrap"><table class="impact">
+  <caption>Estimated impact of each eligibility filter</caption>
+  <thead>
+    <tr>
+      <th>Filter (system)</th>
+      <th>What it&#x27;s designed to do</th>
+      <th>Estimated impact on the research audience</th>
+      <th>Intent vs. artifact</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Notifications-page opt-out</th>
+      <td>Let users manage notification preferences in one place</td>
+      <td>Up to ~20% of users have research email off (up to ~35% in GBR)</td>
+      <td>~70% of those also turned off all email or all notifications &mdash; i.e. email/notif-wide actions, not research-specific</td>
+      <td>Open &mdash; consider page redesign + re-opt-in mechanism</td>
+    </tr>
+    <tr>
+      <th>Global Experimentation Framework (treatment-only)</th>
+      <td>Give a high-level, long-term view of channel-level CRM performance</td>
+      <td>Excludes ~30% of opted-in users on average; up to ~90% in some segments</td>
+      <td>Research was filtered by default, outside the framework&#x27;s intended purpose</td>
+      <td>Resolved &mdash; research no longer filtered</td>
+    </tr>
+    <tr>
+      <th>Global cooldown (30-day, any email)</th>
+      <td>Prevent over-contacting users, which can drive opt-outs and low response</td>
+      <td>~35&ndash;50% of the opted-in cohort ineligible on a given day</td>
+      <td>Only ~1&ndash;5% is attributable to prior research outreach; the rest is marketing email</td>
+      <td>Open &mdash; business decision on whether to scope research separately</td>
+    </tr>
+  </tbody>
+</table></div>
 <h2>Question 1: Do Wise Customers Really Not Want to Give Feedback?</h2>
-<h3>Current opt-out rates</h3>
+<h3>Current opt-out rates and what may drive them</h3>
 <p>I took a sample of 1,000,000 users across UK, US, CA, FR, DE, and AUS and looked at the opt out preferences from the notifications screen.</p>
 <p>Campaign email and cards &amp; balances email have such high opt-out rate and so little variance it must be assumed these are default opt-in (somebody check me on this).</p>
 <p>Nearly 20% opt out of Research Emails, essentially opting out at the same rate as Promotional Emails. It is unusual that these are nearly identical, suggesting something is up.</p>
@@ -171,12 +201,12 @@
 <figure class="chart"><img src="Visualisations/chart_1a_opt_out_rate_by_country.png" alt="Opt-out rate by notification type and country"><figcaption>Opt-out rate by notification type and country</figcaption></figure>
 <p>Breaking this down by country, the main takeaway from this is that GBR is a pretty big outlier in the opt outs. We should bear that in mind when doing research in the UK.</p>
 <p>These opt out rates are pretty high - 20% on average, up to 35% in the UK. To be fair, this is higher than I expected. But, even still this is nowhere near the opt-out rates that Braze reports.</p>
-<h2>Quesiton 2: What could cause the discrepancy between user opt-out intent and our reported opt-out rates?</h2>
+<h3>Notifications preferences design</h3>
 <p>Users can opt-out from receiving research outreach through Settings -&gt; Notifications -&gt; Notifications path.</p>
 <p>The notifications screen has a master toggle to allow notifications at all, and then groups different types of notifications.</p>
 <p>Invitations to share feedback is included on this page, below the fold.</p>
 <figure class="chart"><img src="Visualisations/notifications_screen_screenshot.png" alt="Wise notifications settings screen showing grouped notification toggles"><figcaption>The in-app notifications settings screen. &ldquo;Invitations to share feedback&rdquo; (research) sits below the fold, grouped with marketing toggles.</figcaption></figure>
-<p>This is a potentially severe design problem that may be having an unintended effect of opting people out of research without true intent to do so.</p>
+<p>The notifications page groups email preferences together, which makes sense for most users &mdash; but it could mean that research is bundled into a broader &quot;stop emailing me&quot; action, or inadvertently opting people out without a specific intent to decline feedback.</p>
 <p>There are two methods through which this could happen:</p>
 <ol>
 <li>The user toggles off &quot;Allow notifications&quot;, without even realising that they have opted out of research
@@ -192,7 +222,7 @@
 </li>
 <li>People who opted out of ALL EMAIL communication (purge of email communication rather than pure intent)
 </li>
-<li>People who opted out of ALL NOTIFICATION (what we&#x27;d see if they flipped the toggle rather than pure intent)
+<li>People who opted out of ALL NOTIFICATIONS (what we&#x27;d see if they flipped the toggle rather than pure intent)
 </li>
 </ol>
 <p>Three things stand out:</p>
@@ -201,23 +231,23 @@
 </li>
 <li>About a quarter of the people who have opted out of research emails have opted out of everything, which is a potential signal that they&#x27;ve simply toggled all notifications off
 </li>
-<li>Basically no one is looking at this screen and choosing only to not give feedback
+<li>Basically no one is looking at this screen and choosing ONLY to not give feedback
 </li>
 </ul>
 <figure class="chart"><img src="Visualisations/chart_2_opt_out_groups.png" alt="Research opt-out groups"><figcaption>Research opt-out groups</figcaption></figure>
-<p>This is a strong indication that people are going into this page to turn off marketing emails and research gets caught in the crossfire. Without further data, you could argue that the ~30% who choose surveys and other options are being selective and that&#x27;s a signal of intent.</p>
+<p>This is a strong indication that people are going into this page to turn off marketing emails, and research is bundled into the same action. Without further data, you could argue that the ~30% who choose surveys and other options are being selective and that&#x27;s a signal of intent.</p>
 <p>But, the opt out of all and opt out of all email (~70% of survey opt outs) are probably a symptom of poor design of the notifications page than actual intent not to give feedback. In other words, the <strong>design of this page might be causing us to lose up to 70% of our potential respondents &amp; participants.</strong></p>
 <figure class="chart"><img src="Visualisations/chart_3_correlation_matrix.png" alt="Opt-out correlation matrix"><figcaption>Opt-out correlation matrix</figcaption></figure>
 <p>The email-to-email correlations are higher than email-to-push or push-to-push correlations. That tells you:</p>
 <p>People are turning off email channels as a block, not individually. When someone opts out of Promotional Email, they very likely also opt out of Transfers Email, Surveys Email, etc. The push channels don&#x27;t show the same clustering as they are toggled more independently.</p>
-<p>This is consistent with the chart above and the idea that survey research is getting unduly restricted. It suggests there&#x27;s either:</p>
+<p>This is consistent with the chart above and the idea that the research opt-out is being driven by the email grouping rather than feedback-specific intent. It suggests there&#x27;s either:</p>
 <ul>
 <li>A UI pattern that groups email toggles together (or an &quot;unsubscribe all emails&quot; link at the bottom of an email)
 </li>
-<li>A user mental model of &quot;I don&#x27;t want emails from Wise&quot; rather than &quot;I don&#x27;t want to hear about surveys specifically&quot;
+<li>A user mental model of &quot;I don&#x27;t want emails from Wise&quot; rather than &quot;I don&#x27;t want to hear about research specifically&quot;
 </li>
 </ul>
-<p>Either way, the surveys opt-out is being driven by an anti-email sentiment, not an anti-feedback sentiment.</p>
+<p>Either way, the research opt-out is likely being driven by an anti-email sentiment, rather than anti-feedback sentiment.</p>
 <p>Given this information there seem to be two things which need to be done:</p>
 <ol>
 <li>Move the Research Opt-In to a different part of settings.
@@ -229,7 +259,7 @@
 <li>Identify a mechanism to give people who have inadvertently opted out a chance to opt back in. This could be coupled with a redesign. The exact mechanism will require some additional research.
 </li>
 </ol>
-<h2>Ok, opt-out rates are probably inflated due to design. But 20-30% is still &lt; 90% that we often see in Braze. What&#x27;s going on there?</h2>
+<h2>What drives the difference between user opt-outs and Braze eligibility?</h2>
 <p>The above analysis was based on the notifications preferences table, which the CRM tables are built on. It&#x27;s worth checking to see that the CRM tables and notifications preferences tables line up.</p>
 <div class="table-wrap"><table id="T_b5efb">
   <caption>research_email alignment across both CRM tables (row %)</caption>
@@ -282,20 +312,18 @@
 <li>Users who opt out of promotional emails are automatically not assigned. As shown above, many users may be opting out of promotional emails and research emails at the same time inadvertently, putting them forever into unassigned group. <strong>If they ever at a later date opt IN to research emails, we would never be able to respect that intent as the assignment will never change.</strong>
 </li>
 </ul>
-<h2>Is it reasonable to exclude research outreach based on the global experimentaiton framework?</h2>
-<p>No, it&#x27;s not.</p>
-<p>The purpose of the global experimentation framework is to &quot;provide the high level view of channel-level performance of CRM.&quot;</p>
-<p>Research outreach shouldn&#x27;t be subject to this filter, and CRM has confirmed this to be the case. But by default, the experimentation framework &quot;treatment&quot; group filter was applied as part of the &quot;key-email-subjects&quot; exclusion.</p>
-<p>This has now been resolved. Going forward, if you see inexplicably large drop offs in the Braze filtering, confirming whether this filter is active is one of the first things you should check.</p>
+<p>The framework works well for its intended purpose and is methodologically sound for giving a long-term assessment of CRM performance. Research outreach simply sits outside that purpose, and CRM has confirmed it shouldn&#x27;t be subject to the filter.</p>
+<p><strong>The &quot;treatment&quot;-group filter had been applied by default as part of the &quot;key-email-subjects&quot; exclusion; this has now been resolved.</strong></p>
+<p><em>Going forward, if you see an inexplicably large drop-off in Braze filtering, checking whether this filter is active is one of the first things to confirm.</em></p>
 <h2>Global Cooldowns</h2>
 <p>By default Braze will not send to users if they are in a cooldown period - i.e., within 30 days of receiving another outreach.</p>
 <p>This is methodologically a good thing - if we reach out to users too frequently, this can lead to bad side effects including opt-outs, unsubscribes, and poor response rates.</p>
-<p>In the current implementation, research surveys are grouped in with marketing outreach. So if a user received a marketing outreach they would be ineligible to be contacted by research for at least 30 days afterwards.</p>
+<p>In the current implementation, research surveys are grouped in with marketing outreach, so if a user received a marketing outreach they would be ineligible to be contacted by research for at least 30 days afterwards. The question is whether that grouping is the right fit for research, or whether research sits in a different space in users&#x27; minds.</p>
 <p>The impact on this on research availability is below.</p>
 <figure class="chart"><img src="Visualisations/chart_5_cooldown_eligibility.png" alt="Cooldown eligibility over time"><figcaption>Cooldown eligibility over time</figcaption></figure>
 <p>The question of whether or not it is reasonable to group research outreach into the same cooldown channels as marketing outreach is a businesses decision, which should be evaluated.</p>
 <p>As it stands, on any given day, research loses between ~35 - 50% of eligible respondents due to cooldown eligibility from having received any email in the last 30 days. Only 1-5% of those were due to prior research outreach.</p>
-<p>In theory, these are coming from different sources (Wise Research vs Wise) and occupy a different space in users&#x27; minds. We need to explore whether research email has similar effects on unsubscribe rates from marketing outreach as marketing outreach does. Experience from other businesesses would say that this is not the case, and we should confirm that Wise is the outlier to justify maintaining this grouping.</p>
+<p>We need to explore whether research email has similar effects on unsubscribe rates from marketing outreach as marketing outreach does, or whether the different sources (Wise Research vs Wise) mitigates this effect and provides an opportunity to get research outreach to more opted-in users.</p>
 <footer>
   <p>Bryan Carroll &middot; Quantitative UX Researcher, Wise &middot; Source notebook and SQL available in the repository.</p>
 </footer>

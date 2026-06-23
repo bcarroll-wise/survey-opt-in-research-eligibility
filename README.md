@@ -12,7 +12,7 @@ An investigation into why research outreach reaches so few Wise customers, despi
 |-------|--------------------------|----------------|
 | Notification opt-outs | At most ~20% genuinely opt out of research | Mixed — 25–70% of opt-outs look unintentional |
 | Notifications page design | Up to ~70% of research opt-outs coincide with email/all-notification purges | Weak — anti-email, not anti-feedback |
-| Global Experimentation Framework | ~30% of opted-in users excluded on average, up to ~90% in some segments | None — inadvertent, now resolved |
+| Global Experimentation Framework | ~30% of opted-in users excluded on average, up to ~90% in some segments | None — filtered by default, outside the framework's purpose; now resolved |
 | 30-day outreach cooldown | ~35–50% ineligible on a given day from any prior email; only 1–5% from prior research | Cooldown is sound; the grouping is the issue |
 
 ## Method
