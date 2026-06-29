@@ -36,7 +36,6 @@ Most of the lost research reach is a measurement/configuration artefact, not gen
 | File | Purpose |
 |------|---------|
 | `analysis.ipynb` | Full analysis notebook with all charts |
-| `index.html` | Branded readout page (GitHub Pages) |
 | `Visualisations/` | Exported chart images + notifications screen screenshot |
 | `notification flags.sql` | Pulls the per-user notification preference flags |
 | `notif prefs compared to crm.sql` | Compares notification prefs vs CRM logged preferences |
